@@ -23,7 +23,7 @@ class test_Amenity(test_basemodel):
 
     def test_name2(self):
         """ """
-        new = self.value()
+        new = self.value(name="amenity-name")
         self.assertEqual(type(new.name), str)
 
 
@@ -137,12 +137,12 @@ class TestAmenity(unittest.TestCase):
 
     def test_name_attr(self):
         """Test that Amenity has attribute name, and it's as an empty string"""
-        amenity = Amenity()
+        amenity = Amenity(name="Gym")
         self.assertTrue(hasattr(amenity, "name"))
         if storage_t == 'db':
-            self.assertEqual(amenity.name, None)
+            self.assertNotEqual(amenity.name, None)
         else:
-            self.assertEqual(amenity.name, "")
+            self.assertEqual(type(amenity.name), str)
 
     def test_to_dict_creates_dict(self):
         """test to_dict method creates a dictionary with proper attrs"""

@@ -6,11 +6,39 @@ apt-get install -y nginx
 directories=("/data/web_static/shared/" "/data/web_static/releases/test/")
 mkdir -p "${directories[@]}"
 
-echo "Nginx!!!" > /data/web_static/releases/test/index.html
+echo "<html>
+  <head>
+  </head>
+  <body>
+ALX
+  </body>
+</html>" > /data/web_static/releases/test/index.html
 ln -sf /data/web_static/releases/test/ /data/web_static/current
 
 chown -R ubuntu /data
 chgrp -R ubuntu /data/
 
-sudo sed -i '/server {/a \	location /hbnb_static {\n		alias /data/web_static/current;\n		index index.html index.htm;\n	}' /etc/nginx/sites-available/default
+printf %s "server {
+    listen 80 default_server;
+    listen [::]:80 default_server;
+    add_header X-Served-By $HOSTNAME;
+    root   /var/www/html;
+    index  index.html index.htm;
+
+    location /hbnb_static {
+        alias /data/web_static/current;
+        index index.html index.htm;
+    }
+
+    location /redirect_me {
+        return 301 https://linmihigo.github.io;
+    }
+
+    error_page 404 /404.html;
+    location /404 {
+      root /var/www/html;
+      internal;
+    }
+}" > /etc/nginx/sites-available/default
+
 nginx -t && nginx -s reload

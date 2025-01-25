@@ -3,16 +3,16 @@
 apt-get -y update
 apt-get install -y nginx
 
-directories=("/data/web_static/shared/" "/data/web_static/releases/test/")
-mkdir -p "${directories[@]}"
+mkdir -p /data/web_static/releases/test/
+mkdir -p /data/web_static/shared/
 
-echo "<html>
+echo '<html>
   <head>
   </head>
   <body>
 ALX
   </body>
-</html>" > /data/web_static/releases/test/index.html
+</html>' > /data/web_static/releases/test/index.html
 ln -sf /data/web_static/releases/test/ /data/web_static/current
 
 chown -R ubuntu /data

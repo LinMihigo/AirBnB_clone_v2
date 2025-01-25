@@ -1,10 +1,5 @@
 #!/usr/bin/python3
-"""
-Fabfile that holds do_deploy
-
-Attributes:
-    env.hosts (list): holds web server ip addresses
-"""
+# Fabfile that holds do_deploy
 from fabric.api import env, put, run, sudo
 import os.path
 
@@ -29,7 +24,7 @@ def do_deploy(archive_path):
 
     if put(archive_path, "/tmp/{}".format(file)).failed is True:
         return False
-    if run("rm -rf /data/web_static/releases/{}/".
+    if sudo("rm -rf /data/web_static/releases/{}/".
            format(name)).failed is True:
         return False
     if run("mkdir -p /data/web_static/releases/{}/".

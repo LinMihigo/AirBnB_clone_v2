@@ -3,7 +3,7 @@
 apt-get -y update
 apt-get install -y nginx
 
-directories=("/data/web_static/shared/", "/data/web_static/releases/test/")
+directories=("/data/web_static/shared/" "/data/web_static/releases/test/")
 mkdir -p "${directories[@]}"
 
 echo "Nginx!!!" > /data/web_static/releases/test/index.html

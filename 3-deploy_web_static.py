@@ -48,7 +48,7 @@ def do_deploy(archive_path):
     if put(archive_path, "/tmp/{}".format(file)).failed is True:
         return False
     if sudo("rm -rf /data/web_static/releases/{}/".
-           format(name)).failed is True:
+            format(name)).failed is True:
         return False
     if run("mkdir -p /data/web_static/releases/{}/".
            format(name)).failed is True:

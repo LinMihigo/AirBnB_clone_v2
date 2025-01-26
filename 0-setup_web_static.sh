@@ -41,4 +41,4 @@ printf %s "server {
     }
 }" > /etc/nginx/sites-available/default
 
-nginx -t && nginx -s reload
+service nginx restart

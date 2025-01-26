@@ -24,7 +24,7 @@ def do_pack():
     if local(f"tar -czvf {archive_path} web_static").succeeded:
         return archive_path
     else:
-        None
+        return False
 
 
 @task
@@ -94,5 +94,7 @@ def deploy():
     if not archive_path:
         return False
 
-    execute(do_deploy, archive_path)
-    return True
+    results = execute(do_deploy, archive_path)
+    if not all(results.values()):
+        print("Failure:", [k for k, v in results.items() if not v])
+        return False

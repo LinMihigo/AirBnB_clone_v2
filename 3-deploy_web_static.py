@@ -5,7 +5,7 @@ Fabfile that creates and distributes an archive to web servers using deploy()
 Attributes:
     env.hosts (list): holds web server ip addresses
 """
-from fabric.api import env, put, run, sudo, local
+from fabric.api import env, put, sudo, local, settings
 from datetime import datetime
 import os.path
 
@@ -40,36 +40,50 @@ def do_deploy(archive_path):
         True: if file exists at archive_path and no error occurs
         False: Otherwise!
     """
-    if os.path.isfile(archive_path) is False:
+    if not os.path.exists(archive_path):
         return False
-    file = archive_path.split("/")[-1]
-    name = file.split(".")[0]
 
-    if put(archive_path, "/tmp/{}".format(file)).failed is True:
+    filename = os.path.basename(archive_path)
+    folder_name = os.path.splitext(filename)[0]
+    release_path = f'/data/web_static/releases/{folder_name}'
+    tmp_path = f'/tmp/{filename}'
+
+    try:
+        with settings(warn_only=True):
+            if put(archive_path, tmp_path).failed:
+                return False
+
+            if sudo(f'rm -rf {release_path}').failed:
+                return False
+
+            if sudo(f'mkdir -p {release_path}').failed:
+                return False
+
+            if sudo(f'tar -xzf {tmp_path} -C {release_path}').failed:
+                return False
+
+            if sudo(f'rm {tmp_path}').failed:
+                return False
+
+            source = f'{release_path}/web_static/*'
+            dest = f'{release_path}/'
+            if sudo(f'mv -f {source} {dest}').failed:
+                return False
+
+            if sudo(f'rm -rf {release_path}/web_static').failed:
+                return False
+
+            if sudo('rm -rf /data/web_static/current').failed:
+                return False
+
+            if sudo(f'ln -s {release_path} /data/web_static/current').failed:
+                return False
+            print("New version deployed!")
+
+        return True
+    except Exception as e:
+        print(f"Deployment failed: {str(e)}")
         return False
-    if sudo("rm -rf /data/web_static/releases/{}/".
-            format(name)).failed is True:
-        return False
-    if run("mkdir -p /data/web_static/releases/{}/".
-           format(name)).failed is True:
-        return False
-    if run("tar -xzf /tmp/{} -C /data/web_static/releases/{}/".
-           format(file, name)).failed is True:
-        return False
-    if run("rm /tmp/{}".format(file)).failed is True:
-        return False
-    if run("mv /data/web_static/releases/{}/web_static/* "
-           "/data/web_static/releases/{}/".format(name, name)).failed is True:
-        return False
-    if run("rm -rf /data/web_static/releases/{}/web_static".
-           format(name)).failed is True:
-        return False
-    if run("rm -rf /data/web_static/current").failed is True:
-        return False
-    if run("ln -s /data/web_static/releases/{}/ /data/web_static/current".
-           format(name)).failed is True:
-        return False
-    return True
 
 
 def deploy():

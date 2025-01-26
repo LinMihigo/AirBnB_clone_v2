@@ -5,12 +5,13 @@ Fabfile that creates and distributes an archive to web servers
 Attributes:
     env.hosts (list): holds web server ip addresses
 """
-from fabric.api import env, put, task, sudo, local, settings, execute
+from fabric.api import env, runs_once, put, task, sudo, local, settings, execute
 from datetime import datetime
 import os.path
 env.hosts = ['100.25.41.202', '100.25.205.60']
 
 
+@runs_once
 def do_pack():
     """Generates a .tgz from contents of web_static"""
     if local("mkdir -p versions").failed:
@@ -24,7 +25,7 @@ def do_pack():
     else:
         None
 
-
+@task
 def do_deploy(archive_path):
     """
     Distributes an archive to web servers
@@ -82,12 +83,13 @@ def do_deploy(archive_path):
         return False
 
 @task
+@runs_once
 def deploy():
     """Full deployment pipeline"""
-    if env.host_string:
-        return
+
     archive_path = do_pack()
     if not archive_path:
         return False
+
     execute(do_deploy, archive_path)
     return True

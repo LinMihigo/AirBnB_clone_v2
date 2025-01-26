@@ -98,3 +98,5 @@ def deploy():
     if not all(results.values()):
         print("Failure:", [k for k, v in results.items() if not v])
         return False
+    else:
+        return True

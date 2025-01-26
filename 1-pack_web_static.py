@@ -7,16 +7,13 @@ import os.path
 
 def do_pack():
     """Generates a .tgz from contents of web_static"""
-    dt = datetime.utcnow()
-    file = "versions/web_static_{}{}{}{}{}{}.tgz".format(dt.year,
-                                                         dt.month,
-                                                         dt.day,
-                                                         dt.hour,
-                                                         dt.minute,
-                                                         dt.second)
-    if os.path.isdir("versions") is False:
-        if local("mkdir -p versions").failed is True:
-            return None
-    if local("tar -cvzf {} web_static".format(file)).failed is True:
+    if local("mkdir -p versions").failed:
         return None
-    return file
+
+    timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
+    archive_path = f"versions/web_static_{timestamp}.tgz"
+
+    if local(f"tar -czvf {archive_path} web_static").succeeded:
+        return archive_path
+    else:
+        None

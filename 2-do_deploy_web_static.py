@@ -1,5 +1,10 @@
 #!/usr/bin/python3
-# Fabfile that holds do_deploy
+"""
+Fabfile that holds deploy()
+
+Attributes:
+    env.hosts (list): holds web server ip addresses
+"""
 from fabric.api import env, put, sudo, settings
 import os
 

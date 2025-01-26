@@ -1,14 +1,13 @@
 #!/usr/bin/python3
 """
-Fabfile that creates and distributes an archive to web servers using deploy()
+Fabfile that creates and distributes an archive to web servers
 
 Attributes:
     env.hosts (list): holds web server ip addresses
 """
-from fabric.api import env, put, sudo, local, settings
+from fabric.api import env, put, task, sudo, local, settings, execute
 from datetime import datetime
 import os.path
-
 env.hosts = ['100.25.41.202', '100.25.205.60']
 
 
@@ -85,8 +84,13 @@ def do_deploy(archive_path):
         print(f"Deployment failed: {str(e)}")
         return False
 
-
+@task
 def deploy():
     """Full deployment pipeline"""
+    if env.host_string:
+        return
     archive_path = do_pack()
-    return do_deploy(archive_path) if archive_path else False
+    if not archive_path:
+        return False
+    execute(do_deploy, archive_path)
+    return True

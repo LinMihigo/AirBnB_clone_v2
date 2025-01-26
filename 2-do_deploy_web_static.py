@@ -25,32 +25,39 @@ def do_deploy(archive_path):
     release_path = f'/data/web_static/releases/{folder_name}'
     tmp_path = f'/tmp/{filename}'
 
-    with settings(warn_only=True):
-        if put(archive_path, tmp_path).failed:
-            return False
+    try:
+        with settings(warn_only=True):
+            if put(archive_path, tmp_path).failed:
+                return False
 
-        if sudo(f'mkdir -p {release_path}').failed:
-            return False
+            if sudo(f'rm -rf {release_path}').failed:
+                return False
 
-        if sudo(f'tar -xzf {tmp_path} -C {release_path}').failed:
-            return False
+            if sudo(f'mkdir -p {release_path}').failed:
+                return False
 
-        if sudo(f'rm {tmp_path}').failed:
-            return False
+            if sudo(f'tar -xzf {tmp_path} -C {release_path}').failed:
+                return False
 
-        source = f'{release_path}/web_static/*'
-        dest = f'{release_path}/'
-        if sudo(f'mv {source} {dest}').failed:
-            return False
+            if sudo(f'rm {tmp_path}').failed:
+                return False
 
-        if sudo(f'rm -rf {release_path}/web_static').failed:
-            return False
+            source = f'{release_path}/web_static/*'
+            dest = f'{release_path}/'
+            if sudo(f'mv -f {source} {dest}').failed:
+                return False
 
-        if sudo('rm -rf /data/web_static/current').failed:
-            return False
+            if sudo(f'rm -rf {release_path}/web_static').failed:
+                return False
 
-        if sudo(f'ln -s {release_path} /data/web_static/current').failed:
-            return False
-        print("New version deployed!")
+            if sudo('rm -rf /data/web_static/current').failed:
+                return False
 
-    return True
+            if sudo(f'ln -s {release_path} /data/web_static/current').failed:
+                return False
+            print("New version deployed!")
+
+        return True
+    except Exception as e:
+        print(f"Deployment failed: {str(e)}")
+        return False

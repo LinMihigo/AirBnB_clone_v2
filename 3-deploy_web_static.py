@@ -81,7 +81,6 @@ def do_deploy(archive_path):
 
         return True
     except Exception as e:
-        print(f"Deployment failed: {str(e)}")
         return False
 
 

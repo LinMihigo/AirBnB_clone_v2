@@ -14,7 +14,7 @@ def states_list():
 
 
 @app.teardown_appcontext
-def close_db(Exception):
+def close_db(Exception=None):
     """closes sqlalchemy session after each request"""
     storage.close()
 

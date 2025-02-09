@@ -12,6 +12,7 @@ def states_list():
     states_obj = storage.all("State")
     return render_template('7-states_list.html', states_obj=states_obj)
 
+
 @app.teardown_appcontext
 def close_db(Exception):
     """closes sqlalchemy session after each request"""
